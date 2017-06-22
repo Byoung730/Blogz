@@ -8,6 +8,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:blogz@localhost:3
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 
+#Define classes:
+
 class Blog(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
@@ -23,7 +25,7 @@ class Blog(db.Model):
 class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(40))
+    email = db.Column(db.String(40), unique=True)
     username = db.Column(db.String(40))
     password = db.Column(db.String(40))
     blogs = db.relationship("Blog", backref="author")
@@ -33,7 +35,9 @@ class User(db.Model):
         self.email = email
         self.username = username
         self.password = password
-        
+
+
+#Routes and functions:
 
 @app.route("/", methods=['GET','POST'])
 def index():
@@ -45,6 +49,7 @@ def index():
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     error = None
+    #Login Verification
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -71,13 +76,14 @@ def register():
 
 
     if request.method == 'POST':
-        print(type(request.form))
+
+        #print(type(request.form)) -- Checking code in command prompt
         email = request.form['email']
         password = request.form['password']
         verify = request.form['verify']
         username = request.form['username']
 
-        # TODO - validate user's data
+        #Validate user's data:
 
         existing_user = User.query.filter_by(email=email).first()
         existing_username = User.query.filter_by(username=username).first()
@@ -87,11 +93,9 @@ def register():
             new_user = User(username, password, email)
             db.session.add(new_user)
             db.session.commit()
-            print(new_user)
-            # TODO - "remember" the user
+            #print(new_user) -- I was ckecking my code in the command prompt
             return redirect('/login')
         else:
-            # TODO - user better response messaging
             return "<h1>Duplicate user</h1>"
 
     return render_template('signup.html', Password_error=Password_error, Username_error=Username_error, Email_error=Email_error)
@@ -101,7 +105,7 @@ def register():
 @app.route("/blog", methods=['GET','POST'])
 def index2():
 
-        #session['logged_in'] == False
+        #session['logged_in'] == False -- I don't think I need this
 
         blogs = Blog.query.all()
 
@@ -109,6 +113,8 @@ def index2():
 
 @app.route("/blog_delete", methods=['GET', 'POST'])
 def delete_entry():
+
+    #Delete individual blogs -- I need to make it so only the author can delete their own blogs
 
     blog_to_delete = int(request.form['delete'])
     blogD = Blog.query.get(blog_to_delete)
@@ -132,9 +138,11 @@ def index3():
 
         title = request.form['blog_name']
         body = request.form['blog']
-        #author = request.form['author']
-        print(body)
+        #author_id = request.form['author_id'] -- I don't think I need this
+        #print(body) -- checking my code in command prompt
 
+
+        #Preventing empty entries:
         if title.strip(' ') == "":
 
             title_error = "Please enter a title"
@@ -145,10 +153,10 @@ def index3():
 
 
         if not title_error and not body_error:
+            #If all is well, update database
 
             blog_body = request.form['blog']
             blog_name = request.form['blog_name']
-
             new_blog = Blog(blog_name, blog_body, author_id=session['author_id'])
             db.session.add(new_blog)
             db.session.commit()
@@ -160,18 +168,18 @@ def index3():
             return render_template('new_blog_template.html', title="NerdBlog", blog=blog, author=session['username'])
         
         else:
-
+            #error stuff
             return render_template('blog_template3.html', title="NerdBlogError", title_error=title_error, body_error=body_error)
 
     else:
-
+        #I forgot why I put this in here
         return render_template('blog_template3.html', title="NerdBlogNew", blogs=blogs, title_error=title_error, body_error=body_error)
 
 
 @app.route("/logout", methods=['GET'])
 def logout():
 
-    #print(type(session))
+    #print(type(session)) -- checking code in command prompt
     session.pop('logged_in', None)
     return redirect('/blog')
 
