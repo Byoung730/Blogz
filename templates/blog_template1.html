@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1>Welcome to Brian's Fake Public Blog</h1>
+    
+   
+    {% if not session['logged_in'] == True %}
+
+    <nav>
+        <a href="/signup">Sign up</a>
+        <div>
+        <a href="/login">Login</a>
+        </div>
+    </nav>
+
+    {% else %}
+
+    <nav>
+        <a href="/newpost">Write new blog</a>
+        <div>
+        <a href="/logout">Log out</a>
+        </div>
+    </nav>    
+
+        <h2>Previous Entries</h2>
+
+        {% if blogs|length == 0  %}
+        <p>No entries</p>
+    
+        {% else %}
+        <ul>
+            {% for blog in blogs %}
+            <form action='/blog_delete' method='post'>
+            <li>{{blog.name}}
+                <div>{{blog.body}}</div>
+                <div>Written by user #{{blog.author_id}}</div>
+                <div><input id='delete' type='hidden' name='delete' value={{blog.id}} />
+                <input type='submit' value='Delete Entry' /></div>
+            </li>
+            </form>
+            {%endfor%}
+        
+        </ul>
+
+        {% endif %}
+
+    {% endif %}
+
+    {% endblock %}
+
+</body>
+</html>

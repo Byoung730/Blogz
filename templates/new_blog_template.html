@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1>Your Current Entry</h1>
+    
+    <nav>
+        <a href="/">Home</a>
+        <a href="/newpost">Write New Blog</a>
+    </nav>
+
+
+    <ul>
+        
+        <form action='/blog_delete' method='post'>
+        <li>{{blog.name}}
+            <div>{{blog.body}}</div>
+            <div>{{blog.author_id}}</div>
+            <div><input id='delete' type='hidden' name='delete' value={{blog.id}} />
+            <input type='submit' value='Delete Entry' /></div>
+        </li>
+        </form>
+      
+       
+    </ul>
+
+    {% endblock %}
+
+</body>
+</html>

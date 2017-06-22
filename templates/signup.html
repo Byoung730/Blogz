@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+ <body>
+        <h1 style='text-align:center'>User Signup</h1>
+         <form method = "post" action = "/signup">
+         <div>
+      <label for = "username">Username:
+      <input id="username" type="text" name="username" />
+            </label>
+            {% if Username_error %}
+            <p class = "error">{{Username_error}}</p>
+            {% endif %}
+           </div> <div>
+      <label for = "password">Password:
+      <input id="password" type="password" name="password" />
+            </label></div>
+            <div>
+      <label for = "password_verify">Verify Password:
+      <input id="verify" type="password" name="verify" />
+            </label>
+            {% if Password_error %}
+            <p class = "error">{{Password_error}}</p>
+            {% endif %}
+            </div>          
+                 <div>
+      <label for = "email">Email:
+      <input id="email" type="text" name="email" />
+            </label>
+            {% if Email_error %}
+            <p class = "error">{{Email_error}}</p>
+            {% endif %}
+            </div>            
+            <div>
+      <input type="submit" value="Sign in">
+            </div>
+    </body>
+
+
+
+
+{% endblock %}
+
+</body>
+</html>

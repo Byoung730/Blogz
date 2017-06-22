@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+
+<h1>New Blog:</h1>
+    <form action="/newpost" method='post'>
+        <label>
+            New Blog Title:
+            <input id='blog_name' type='text' name='blog_name' />           
+        </label>
+        {% if title_error %}
+            <p class = "error">{{title_error}}</p>
+        {% endif %}
+
+    <hr />
+
+    
+        <label>
+            New Blog:
+            <textarea id='blog' name='blog' ></textarea>
+        </label>
+        {% if body_error %}
+            <p class = "error">{{body_error}}</p>
+        {% endif %}
+        <input type='submit' value='Finished' />
+    </form>
+
+{% endblock %}
+
+</body>
+</html>
