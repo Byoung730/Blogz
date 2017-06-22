@@ -50,27 +50,18 @@ def index():
 def login():
     error = None
     #Login Verification
-
     if request.method == 'POST':
-
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
-        
-        #Code testing
-        #print(password)
-        #print(username)
-        #print(user)
-        #print(user.password)
-
         if user and user.password == password:
             session['logged_in'] = True
             session['author_id'] = user.id
             flash('Welcome')
             return redirect('/')
         else:          
-            flash('Error: Invalid login -- Please try again or register')
-            return redirect('/login')
+            flash('Error: Invalid login -- Please try again or go back and register')
+            return render_template('login.html', error=error)
 
     return render_template('login.html', error=error)
 
@@ -94,35 +85,18 @@ def register():
 
         #Validate user's data:
 
-        if len(username) < 2 or len(username) > 30:
-
-            flash('Invalid Username -- too short or too long')
-            return redirect("/signup")
-
-        if password != verify:
-
-            flash("Passwords do not match")
-            return redirect("/signup")
-
-        if '@' not in email:
-
-            flash("Invalid Email address")
-            return redirect("/signup")
-
-
+        existing_user = User.query.filter_by(email=email).first()
+        existing_username = User.query.filter_by(username=username).first()
+        print(existing_user)
+        print(existing_username)
+        if not existing_user and not existing_username:
+            new_user = User(username, password, email)
+            db.session.add(new_user)
+            db.session.commit()
+            #print(new_user) -- I was ckecking my code in the command prompt
+            return redirect('/login')
         else:
-            existing_user = User.query.filter_by(email=email).first()
-            existing_username = User.query.filter_by(username=username).first()
-            print(existing_user)
-            print(existing_username)
-            if not existing_user and not existing_username:
-                new_user = User(username, password, email)
-                db.session.add(new_user)
-                db.session.commit()
-                #print(new_user) -- I was ckecking my code in the command prompt
-                return redirect('/login')
-            else:
-                return "<h1>Duplicate user</h1>"
+            return "<h1>Duplicate user</h1>"
 
     return render_template('signup.html', Password_error=Password_error, Username_error=Username_error, Email_error=Email_error)
 
@@ -140,16 +114,28 @@ def index2():
 @app.route("/blog_delete", methods=['GET', 'POST'])
 def delete_entry():
 
+
+    print(request.form['User.id'])
+    print(request.form['Blog.author_id'])
     #Delete individual blogs -- I need to make it so only the author can delete their own blogs
+    if request.form['User.id'] == request.form['Blog.author_id']:
+        blog_to_delete = int(request.form['delete'])
+        blogD = Blog.query.get(blog_to_delete)
+        db.session.delete(blogD)
+        db.session.commit()
 
-    blog_to_delete = int(request.form['delete'])
-    blogD = Blog.query.get(blog_to_delete)
-    db.session.delete(blogD)
-    db.session.commit()
+        blogs = Blog.query.all()
 
-    blogs = Blog.query.all()
+        return render_template('blog_template1.html', title="NerdBlog", blogs=blogs)
+    
+    else:
 
-    return render_template('blog_template1.html', title="NerdBlog", blogs=blogs)
+        blogs = Blog.query.all()
+
+        flash('Not your entry -- Cannot delete')
+        return render_template('blog_template1.html', title="NerdBlog", blogs=blogs)
+
+
 
 @app.route("/newpost", methods=['POST', 'GET'])
 def index3():
