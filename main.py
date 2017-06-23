@@ -119,7 +119,7 @@ def register():
                 new_user = User(username, password, email)
                 db.session.add(new_user)
                 db.session.commit()
-                #print(new_user) -- I was ckecking my code in the command prompt
+                #print(new_user) -- I was checking my code in the command prompt
                 return redirect('/login')
             else:
                 return "<h1>Duplicate user</h1>"
@@ -140,16 +140,27 @@ def index2():
 @app.route("/blog_delete", methods=['GET', 'POST'])
 def delete_entry():
 
-    #Delete individual blogs -- I need to make it so only the author can delete their own blogs
+    #code check:
+    #print(session['author_id'])
+    #print(request.form['author_id'])
 
-    blog_to_delete = int(request.form['delete'])
-    blogD = Blog.query.get(blog_to_delete)
-    db.session.delete(blogD)
-    db.session.commit()
+    #Delete individual blogs -- Only the author can delete their own blogs
+
+    if session['author_id'] == int(request.form['author_id']):
+        blog_to_delete = int(request.form['delete'])
+        blogD = Blog.query.get(blog_to_delete)
+        db.session.delete(blogD)
+        db.session.commit()
+
+        blogs = Blog.query.all()
+
+        return render_template('blog_template1.html', title="NerdBlog", blogs=blogs)
 
     blogs = Blog.query.all()
 
+    flash('Not your entry -- Cannot delete')
     return render_template('blog_template1.html', title="NerdBlog", blogs=blogs)
+
 
 @app.route("/newpost", methods=['POST', 'GET'])
 def index3():
@@ -191,7 +202,7 @@ def index3():
         
             blog = Blog.query.filter_by(id=newblog_id).first()
 
-            return render_template('new_blog_template.html', title="NerdBlog", blog=blog, author=session['username'])
+            return render_template('new_blog_template.html', title="NerdBlog", blog=blog, author_id=session['author_id'])
         
         else:
             #error stuff

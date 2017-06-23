@@ -35,6 +35,7 @@
             <li>{{blog.name}}
                 <div>{{blog.body}}</div>
                 <div>Written by user #{{blog.author_id}}</div>
+                <div><input id='author_id' type='hidden' name='author_id' value={{blog.author_id}}></div>
                 <div><input id='delete' type='hidden' name='delete' value={{blog.id}} />
                 <input type='submit' value='Delete Entry' /></div>
             </li>

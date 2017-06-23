@@ -115,10 +115,10 @@ def index2():
 def delete_entry():
 
 
-    print(request.form['User.id'])
-    print(request.form['Blog.author_id'])
+    print(session['author_id'])
+    print(request.form['author_id'])
     #Delete individual blogs -- I need to make it so only the author can delete their own blogs
-    if request.form['User.id'] == request.form['Blog.author_id']:
+    if session['author_id'] == int(request.form['author_id']):
         blog_to_delete = int(request.form['delete'])
         blogD = Blog.query.get(blog_to_delete)
         db.session.delete(blogD)
@@ -127,13 +127,11 @@ def delete_entry():
         blogs = Blog.query.all()
 
         return render_template('blog_template1.html', title="NerdBlog", blogs=blogs)
-    
-    else:
 
-        blogs = Blog.query.all()
+    blogs = Blog.query.all()
 
-        flash('Not your entry -- Cannot delete')
-        return render_template('blog_template1.html', title="NerdBlog", blogs=blogs)
+    flash('Not your entry -- Cannot delete')
+    return render_template('blog_template1.html', title="NerdBlog", blogs=blogs)
 
 
 
@@ -177,7 +175,7 @@ def index3():
         
             blog = Blog.query.filter_by(id=newblog_id).first()
 
-            return render_template('new_blog_template.html', title="NerdBlog", blog=blog, author=session['username'])
+            return render_template('new_blog_template.html', title="NerdBlog", blog=blog, author_id=session['author_id'])
         
         else:
             #error stuff
